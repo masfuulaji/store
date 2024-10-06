@@ -19,7 +19,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: file_store
+      POSTGRES_DB: store
     container_name: db-store
     volumes:
       - postgres_data:/var/lib/postgresql/data
