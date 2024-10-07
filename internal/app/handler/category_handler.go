@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -34,13 +35,13 @@ func (f *CategoryHandlerImpl) CreateCategory(w http.ResponseWriter, r *http.Requ
 		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
-	err = f.categoryRepository.CreateCategory(category)
+	id, err := f.categoryRepository.CreateCategory(category)
 	if err != nil {
 		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 
-	utils.RespondWithJSON(w, 200, map[string]string{"message": "Category created successfully"})
+	utils.RespondWithJSON(w, 200, map[string]string{"message": fmt.Sprintf("Category created successfully %d", id)})
 }
 
 func (f *CategoryHandlerImpl) UpdateCategory(w http.ResponseWriter, r *http.Request) {

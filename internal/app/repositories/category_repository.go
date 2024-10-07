@@ -8,7 +8,7 @@ import (
 )
 
 type CategoryRepository interface {
-	CreateCategory(category models.Category) error
+	CreateCategory(category models.Category) (int, error)
 	GetCategory(id string) (models.Category, error)
 	GetCategories() ([]models.Category, error)
 	UpdateCategory(category models.Category, id string) error
@@ -23,15 +23,16 @@ func NewCategoryRepository(db *sqlx.DB) *CategoryRepositoryImpl {
 	return &CategoryRepositoryImpl{db: db}
 }
 
-func (u *CategoryRepositoryImpl) CreateCategory(category models.Category) error {
-	query := "INSERT INTO categories (name, created_at, updated_at) VALUES ($1, $2, $3)"
+func (u *CategoryRepositoryImpl) CreateCategory(category models.Category) (int, error) {
+	query := "INSERT INTO categories (name, created_at, updated_at) VALUES ($1, $2, $3) RETURNING id"
 	createdAt := time.Now().Format("2006-01-02 15:04:05")
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := u.db.Exec(query, category.Name, createdAt, updatedAt)
+	var id int
+	err := u.db.QueryRow(query, category.Name, createdAt, updatedAt).Scan(&id)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return id, nil
 }
 
 func (u *CategoryRepositoryImpl) GetCategory(id string) (models.Category, error) {
