@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-store
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    networks:
+      - go-network
+  db:
+    image: postgres:15-alpine
+    ports:
+      - 5442:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: store
+    container_name: db-store
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - go-network
+volumes:
+  postgres_data:
+networks:
+  go-network:
+    driver: bridge
