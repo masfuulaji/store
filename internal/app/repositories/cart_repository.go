@@ -27,7 +27,7 @@ func NewCartRepository(db *sqlx.DB) *CartRepositoryImpl {
 }
 
 func (u *CartRepositoryImpl) CreateCart(cart models.Cart) (int, error) {
-	query := "INSERT INTO carts (name, user_id, price_total, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)"
+	query := "INSERT INTO carts (name, user_id, price_total, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id"
 	createdAt := time.Now().Format("2006-01-02 15:04:05")
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
 	var id int
@@ -50,7 +50,7 @@ func (u *CartRepositoryImpl) GetCart(id string) (models.Cart, error) {
 
 func (u *CartRepositoryImpl) GetCartByUserId(id string) (models.Cart, error) {
 	var cart models.Cart
-	query := "SELECT * FROM carts WHERE user_id = $1 AND finish != 1 AND deleted_at IS NULL"
+	query := "SELECT * FROM carts WHERE user_id = $1 AND finish IS NULL AND deleted_at IS NULL"
 	err := u.db.Get(&cart, query, id)
 	if err != nil {
 		return cart, err
@@ -60,7 +60,7 @@ func (u *CartRepositoryImpl) GetCartByUserId(id string) (models.Cart, error) {
 
 func (u *CartRepositoryImpl) CountCartByUserId(id string) (int, error) {
 	var count int
-	query := "SELECT COUNT(*) FROM carts WHERE user_id = $1 AND finish != 1 AND deleted_at IS NULL"
+	query := "SELECT COUNT(*) FROM carts WHERE user_id = $1 AND finish is null AND deleted_at IS NULL"
 	err := u.db.QueryRow(query, id).Scan(&count)
 	if err != nil {
 		return count, err

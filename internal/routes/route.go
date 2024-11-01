@@ -36,4 +36,29 @@ func SetupRoutes(r *chi.Mux) {
 		r.Put("/{id}", productHandler.UpdateProduct)
 		r.Delete("/{id}", productHandler.DeleteProduct)
 	})
+
+	userHandler := handlers.NewUserHandler(db.DB)
+	r.Route("/user", func(r chi.Router) {
+		r.Get("/", userHandler.GetUsers)
+		r.Get("/{id}", userHandler.GetUser)
+		r.Post("/", userHandler.CreateUser)
+		r.Put("/{id}", userHandler.UpdateUser)
+		r.Delete("/{id}", userHandler.DeleteUser)
+	})
+
+	loginHandler := handlers.NewLoginHandler(db.DB)
+	r.Route("/auth", func(r chi.Router) {
+		r.Post("/", loginHandler.Login)
+		r.Get("/logout", loginHandler.Logout)
+	})
+
+	cartHandler := handlers.NewCartHandler(db.DB)
+	r.Route("/cart", func(r chi.Router) {
+		r.Use(AuthMiddleware)
+		r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("Auth!"))
+		})
+		r.Post("/add", cartHandler.AddCartItem)
+		r.Delete("/delete/{id}", cartHandler.DeleteCart)
+	})
 }

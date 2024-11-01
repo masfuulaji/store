@@ -12,6 +12,7 @@ type CartItemRepository interface {
 	GetCartItem(id string) (models.CartItem, error)
 	GetCartItems() ([]models.CartItem, error)
 	GetCartItemsByCart(id string) ([]models.CartItem, error)
+	GetCartItemByCart(id string) ([]models.CartItem, error)
 	SumCartItemByCart(id string) (int, error)
 	UpdateCartItem(cartItem models.CartItem, id string) error
 	DeleteCartItem(id string) error
@@ -58,7 +59,7 @@ func (u *CartItemRepositoryImpl) GetCartItems() ([]models.CartItem, error) {
 
 func (u *CartItemRepositoryImpl) GetCartItemsByCart(id string) ([]models.CartItem, error) {
 	var cartItems []models.CartItem
-	query := "SELECT * FROM cart_items WHERE cart_id = $1 deleted_at IS NULL"
+	query := "SELECT * FROM cart_items WHERE cart_id = $1 AND deleted_at IS NULL"
 	err := u.db.Select(&cartItems, query, id)
 	if err != nil {
 		return cartItems, err
@@ -66,18 +67,27 @@ func (u *CartItemRepositoryImpl) GetCartItemsByCart(id string) ([]models.CartIte
 	return cartItems, nil
 }
 
+func (u *CartItemRepositoryImpl) GetCartItemByCart(id string) (models.CartItem, error) {
+	var cartItems models.CartItem
+	query := "SELECT * FROM cart_items WHERE cart_id = $1 AND deleted_at IS NULL"
+	err := u.db.Get(&cartItems, query, id)
+	if err != nil {
+		return cartItems, err
+	}
+	return cartItems, nil
+}
 func (u *CartItemRepositoryImpl) SumCartItemByCart(id string) (int, error) {
-	var count int
+	var count float64
 	query := "SELECT SUM(price_total) FROM cart_items WHERE cart_id = $1 AND deleted_at IS NULL"
 	err := u.db.QueryRow(query, id).Scan(&count)
 	if err != nil {
-		return count, err
+		return int(count), err
 	}
-	return count, nil
+	return int(count), nil
 }
 
 func (u *CartItemRepositoryImpl) UpdateCartItem(cartItem models.CartItem, id string) error {
-	query := "UPDATE cart_items SET product_qty = $1, price_total = $2 updated_at = $3 WHERE id = $4 AND deleted_at IS NULL"
+	query := "UPDATE cart_items SET product_qty = $1, price_total = $2, updated_at = $3 WHERE id = $4 AND deleted_at IS NULL"
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
 	_, err := u.db.Exec(query, cartItem.ProductQty, cartItem.PriceTotal, updatedAt, id)
 	if err != nil {

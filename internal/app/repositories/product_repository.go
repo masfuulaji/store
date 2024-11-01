@@ -24,10 +24,10 @@ func NewProductRepository(db *sqlx.DB) *ProductRepositoryImpl {
 }
 
 func (u *ProductRepositoryImpl) CreateProduct(product models.Product) error {
-	query := "INSERT INTO products (name, category_id, price, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)"
+	query := "INSERT INTO products (name, category_id, price, stock, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)"
 	createdAt := time.Now().Format("2006-01-02 15:04:05")
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := u.db.Exec(query, product.Name, product.CategoryId, product.Price, createdAt, updatedAt)
+	_, err := u.db.Exec(query, product.Name, product.CategoryId, product.Price, product.Stock, createdAt, updatedAt)
 	if err != nil {
 		return err
 	}
@@ -65,9 +65,9 @@ func (u *ProductRepositoryImpl) GetProductsByCategory(id string) ([]models.Produ
 }
 
 func (u *ProductRepositoryImpl) UpdateProduct(product models.Product, id string) error {
-	query := "UPDATE products SET name = $1, category_id = $2, price = $3, updated_at = $4 WHERE id = $5"
+	query := "UPDATE products SET name = $1, category_id = $2, price = $3, stock = $4, updated_at = $5 WHERE id = $6"
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := u.db.Exec(query, product.Name, product.CategoryId, product.Price, updatedAt, id)
+	_, err := u.db.Exec(query, product.Name, product.CategoryId, product.Price, product.Stock, updatedAt, id)
 	if err != nil {
 		return err
 	}

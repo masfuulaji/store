@@ -27,10 +27,10 @@ func NewUserRepository(db *sqlx.DB) *UserRepositoryImpl {
 }
 
 func (u *UserRepositoryImpl) CreateUser(user models.User) error {
-	query := "INSERT INTO users (username, email, password, role, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)"
+	query := "INSERT INTO users (username, email, password, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)"
 	createdAt := time.Now().Format("2006-01-02 15:04:05")
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
-	_, err := u.db.Exec(query, user.Username, user.Email, user.Password, "user", createdAt, updatedAt)
+	_, err := u.db.Exec(query, user.Username, user.Email, user.Password, createdAt, updatedAt)
 	if err != nil {
 		return err
 	}

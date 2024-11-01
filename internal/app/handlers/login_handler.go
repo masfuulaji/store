@@ -14,6 +14,7 @@ import (
 
 type LoginHandler interface {
 	Login(w http.ResponseWriter, r *http.Request)
+	Logout(w http.ResponseWriter, r *http.Request)
 }
 
 type LoginHandlerImpl struct {
@@ -75,11 +76,13 @@ func (u *LoginHandlerImpl) Login(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "Login successful"})
 }
 
-func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+func (u *LoginHandlerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   "",
-		Expires: time.Now().Add(-1 * time.Hour),
+		Name:     "token",
+		Value:    "",
+		Expires:  time.Now(),
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
 	})
 	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "Logout successful"})
 }

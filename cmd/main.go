@@ -1,14 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/masfuulaji/store/config"
 	"github.com/masfuulaji/store/internal/routes"
 )
 
 func main() {
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		fmt.Println("config error")
+	}
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
@@ -21,5 +27,6 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 	routes.SetupRoutes(r)
-	http.ListenAndServe(":3000", r)
+	port := fmt.Sprintf(":%v", cfg.App.Port)
+	http.ListenAndServe(port, r)
 }
