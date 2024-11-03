@@ -62,4 +62,9 @@ func SetupRoutes(r *chi.Mux) {
 		r.Delete("/delete/{id}", cartHandler.DeleteCart)
 		r.Get("/{id}", cartHandler.ReadCart)
 	})
+
+	orderHandler := handlers.NewOrderHandler(db.DB)
+	r.Route("/order", func(r chi.Router) {
+		r.Post("/add", orderHandler.CreateOrder)
+	})
 }

@@ -12,6 +12,7 @@ type ProductRepository interface {
 	GetProduct(id string) (models.Product, error)
 	GetProducts() ([]models.Product, error)
 	UpdateProduct(product models.Product, id string) error
+	UpdateProductStock(stock int, id string) error
 	DeleteProduct(id string) error
 }
 
@@ -68,6 +69,16 @@ func (u *ProductRepositoryImpl) UpdateProduct(product models.Product, id string)
 	query := "UPDATE products SET name = $1, category_id = $2, price = $3, stock = $4, updated_at = $5 WHERE id = $6"
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
 	_, err := u.db.Exec(query, product.Name, product.CategoryId, product.Price, product.Stock, updatedAt, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *ProductRepositoryImpl) UpdateProductStock(stock int, id string) error {
+	query := "UPDATE products SET stock = $1, updated_at = $2 WHERE id = $3"
+	updatedAt := time.Now().Format("2006-01-02 15:04:05")
+	_, err := u.db.Exec(query, stock, updatedAt, id)
 	if err != nil {
 		return err
 	}

@@ -15,6 +15,7 @@ type CartRepository interface {
 	GetCarts() ([]models.Cart, error)
 	UpdateCart(cart models.Cart, id string) error
 	UpdateCartTotal(sum int, id string) error
+	UpdateCartFinish(finish int, id string) error
 	DeleteCart(id string) error
 }
 
@@ -92,6 +93,16 @@ func (u *CartRepositoryImpl) UpdateCartTotal(sum int, id string) error {
 	query := "UPDATE carts SET price_total = $1, updated_at = $2 WHERE id = $3 AND deleted_at IS NULL"
 	updatedAt := time.Now().Format("2006-01-02 15:04:05")
 	_, err := u.db.Exec(query, sum, updatedAt, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *CartRepositoryImpl) UpdateCartFinish(finish int, id string) error {
+	query := "UPDATE carts SET finish = $1, updated_at = $2 WHERE id = $3 AND deleted_at IS NULL"
+	updatedAt := time.Now().Format("2006-01-02 15:04:05")
+	_, err := u.db.Exec(query, finish, updatedAt, id)
 	if err != nil {
 		return err
 	}

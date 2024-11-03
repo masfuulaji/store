@@ -17,6 +17,7 @@ import (
 type CartHandler interface {
 	AddCartItem(w http.ResponseWriter, r *http.Request)
 	DeleteCart(w http.ResponseWriter, r *http.Request)
+	ReadCart(w http.ResponseWriter, r *http.Request)
 }
 
 type CartHandlerImpl struct {
@@ -71,8 +72,8 @@ func (f *CartHandlerImpl) AddCartItem(w http.ResponseWriter, r *http.Request) {
 
 	order_data := models.Cart{
 		Name:       "cart 1",
-		UserId:     "1",
-		PriceTotal: 10,
+		UserId:     idS,
+		PriceTotal: 0,
 	}
 	var cart_id string
 	if cart < 1 {
@@ -148,7 +149,6 @@ func (f *CartHandlerImpl) AddCartItem(w http.ResponseWriter, r *http.Request) {
 		cartItem.PriceTotal = totalItemPrice
 		cartItem.CartId = res.ID
 		oldCartItem, err := f.cartItemRepository.GetCartItemByCart(res.ID)
-		fmt.Println(err)
 		if err != nil {
 			err = f.cartItemRepository.CreateCartItem(cartItem)
 		} else {
